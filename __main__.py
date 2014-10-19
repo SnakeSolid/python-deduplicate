@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import os
 
 
 class Deduplicator:
@@ -9,7 +10,19 @@ class Deduplicator:
 		self.files = files
 		self.min_size = min_size
 	
+	def walk(self, path, append):
+		if os.path.isfile(path):
+			append(path)
+		elif os.path.isdir(path):
+			for listed in os.listdir(path):
+				self.walk(os.path.join(path, listed), append)
+	
 	def process(self):
+		files = []
+		
+		for path in self.files:
+			self.walk(os.path.expanduser(path), files.append)
+		
 		pass
 
 
