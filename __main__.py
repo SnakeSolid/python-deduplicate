@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import collections
 import hashlib
 import os
-import collections
 
 
 class Deduplicator:
@@ -38,6 +38,13 @@ class Deduplicator:
 			return { "path": path, "size": os.path.getsize(path), "md5": hasher_md5.hexdigest(), "sha256": hasher_sha256.hexdigest() }
 		return None
 	
+	def create_symlinks(self, path_list):
+		source_path = path_list[0]
+		
+		for destination_path in path_list[1:]:
+			os.remove(destination_path)
+			os.link(source_path, destination_path)
+	
 	def process(self):
 		all_files = []
 		
@@ -60,7 +67,8 @@ class Deduplicator:
 		
 		similar_files = (listed for _, listed in collected_files.iteritems() if len(listed) > 1)
 		
-		pass
+		for listed in similar_files:
+			self.create_symlinks(listed)
 
 
 if __name__ == "__main__":
